@@ -22,6 +22,13 @@ public class ProcessingCenterFactory {
         this.elcartProcessingCenter = elcartProcessingCenter;
     }
 
+    /**
+     * Returns the appropriate {@link ProcessingCenter} based on the payment system name.
+     *
+     * @param paymentSystemName the name of the payment system (e.g., "Visa", "MasterCard", "Elcart").
+     * @return the corresponding {@link ProcessingCenter} implementation.
+     * @throws BadCredentialException if the provided payment system name is unsupported.
+     */
     public ProcessingCenter getProcessingCenter(String paymentSystemName) {
         return switch (paymentSystemName.toLowerCase()) {
             case "visa" -> visaProcessingCenter;

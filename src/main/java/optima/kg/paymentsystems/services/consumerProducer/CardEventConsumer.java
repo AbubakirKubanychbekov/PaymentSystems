@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class CardEventConsumer {
-    @RabbitListener(queues = "card-events")
-    public void listen(String message) {
-        System.out.println("Received message: " + message);
-    }
+//    @RabbitListener(queues = "card-events")
+//    public void listen(String message) {
+//        System.out.println("Received message: " + message);
+//    }
 }

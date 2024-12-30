@@ -69,7 +69,7 @@ public class CardServiceImpl implements CardService {
         paymentSystem.getCards().add(newCard);
 
         processingCenter.issueCard(newCard);
-        cardEventProducer.sendCardEvent("Card created with ID: " + newCard.getId());
+//        cardEventProducer.sendCardEvent("Card created with ID: " + newCard.getId());
         cardRepository.save(newCard);
         log.info("Card " + newCard + " is saved");
         client.getCards().add(newCard);
