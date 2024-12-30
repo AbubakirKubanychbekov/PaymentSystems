@@ -1,6 +1,6 @@
 package optima.kg.paymentsystems.strategy;
 
-import optima.kg.paymentsystems.dto.entity.Card;
+import optima.kg.paymentsystems.dal.entity.Card;
 
 import java.math.BigDecimal;
 
