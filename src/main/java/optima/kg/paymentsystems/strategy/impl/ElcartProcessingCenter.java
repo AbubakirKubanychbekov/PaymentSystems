@@ -6,6 +6,9 @@ import optima.kg.paymentsystems.strategy.ProcessingCenter;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Random;
 
 /**
  * @author Abubakir Dev
@@ -16,6 +19,8 @@ public class ElcartProcessingCenter implements ProcessingCenter {
     @Override
     public void issueCard(Card card) {
         card.setCardNumber("Elcart-" + System.currentTimeMillis());
+        card.setExpirationDate(generateExpirationDate());
+        card.setCvv(generateCvv());
     }
 
     @Override
@@ -31,5 +36,16 @@ public class ElcartProcessingCenter implements ProcessingCenter {
         }
         BigDecimal newBalance = card.getBalance().subtract(amount);
         card.setBalance(newBalance);
+    }
+
+    private String generateExpirationDate() {
+        // Генерация срока годности (например, +3 года от текущей даты)
+        LocalDate expiration = LocalDate.now().plusYears(3);
+        return expiration.format(DateTimeFormatter.ofPattern("MM/yy"));
+    }
+
+    private String generateCvv() {
+        // Генерация случайного трехзначного CVV
+        return String.format("%03d", new Random().nextInt(1000));
     }
 }

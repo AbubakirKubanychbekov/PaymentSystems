@@ -30,6 +30,26 @@ public class Card {
 
     private BigDecimal balance;
 
+    private String expirationDate;
+
+    private String cvv;
+
+    public String getExpirationDate() {
+        return expirationDate;
+    }
+
+    public void setExpirationDate(String expirationDate) {
+        this.expirationDate = expirationDate;
+    }
+
+    public String getCvv() {
+        return cvv;
+    }
+
+    public void setCvv(String cvv) {
+        this.cvv = cvv;
+    }
+
     public Long getId() {
         return id;
     }
