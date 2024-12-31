@@ -50,26 +50,26 @@ public class CardServiceImplTest {
     private CardServiceImpl cardService;
 
     @Test
-    void issueCard_ShouldIssueCardAndPublishEvent_WhenValidInput() {
+    void issueCard() {
         Long clientId = 1L;
         CardRequestDto cardRequestDto = new CardRequestDto("Visa", BigDecimal.valueOf(1000));
-        Client mockClient = new Client();
-        mockClient.setId(clientId);
-        mockClient.setName("John Doe");
+        Client client = new Client();
+        client.setId(clientId);
+        client.setName("Abubakir Kubanychbekov");
 
-        PaymentSystem mockPaymentSystem = new PaymentSystem();
-        mockPaymentSystem.setName("Visa");
+        PaymentSystem paymentSystem = new PaymentSystem();
+        paymentSystem.setName("Visa");
 
         Card mockCard = new Card();
         mockCard.setBalance(BigDecimal.valueOf(1000));
-        mockCard.setClient(mockClient);
-        mockCard.setPaymentSystem(mockPaymentSystem);
+        mockCard.setClient(client);
+        mockCard.setPaymentSystem(paymentSystem);
 
-        ProcessingCenter mockProcessingCenter = Mockito.mock(ProcessingCenter.class);
+        ProcessingCenter processingCenter = Mockito.mock(ProcessingCenter.class);
 
-        Mockito.when(clientRepository.findById(clientId)).thenReturn(Optional.of(mockClient));
-        Mockito.when(paymentSystemRepository.findByNameIgnoreCase("Visa")).thenReturn(Optional.of(mockPaymentSystem));
-        Mockito.when(processingCenterFactory.getProcessingCenter("Visa")).thenReturn(mockProcessingCenter);
+        Mockito.when(clientRepository.findById(clientId)).thenReturn(Optional.of(client));
+        Mockito.when(paymentSystemRepository.findByNameIgnoreCase("Visa")).thenReturn(Optional.of(paymentSystem));
+        Mockito.when(processingCenterFactory.getProcessingCenter("Visa")).thenReturn(processingCenter);
 
         Mockito.when(cardRepository.save(Mockito.any(Card.class))).thenAnswer(invocation -> {
             Card card = invocation.getArgument(0);
@@ -89,12 +89,11 @@ public class CardServiceImplTest {
     }
 
     @Test
-    void issueCard_ShouldThrowNotFoundException_WhenClientNotFound() {
+    void issueCardNotFoundClientException() {
         Long clientId = 1L;
+
         CardRequestDto cardRequestDto = new CardRequestDto("Visa", BigDecimal.valueOf(1000));
-
         Mockito.when(clientRepository.findById(clientId)).thenReturn(Optional.empty());
-
         NotFoundException exception = Assertions.assertThrows(NotFoundException.class, () ->
                 cardService.issueCard(clientId, cardRequestDto));
         Assertions.assertEquals("Client with id: 1 not found", exception.getMessage());
@@ -102,12 +101,12 @@ public class CardServiceImplTest {
     }
 
     @Test
-    void issueCard_ShouldThrowNotFoundException_WhenPaymentSystemNotFound() {
+    void issueCardNotFoundPaymentSystemException() {
         Long clientId = 1L;
+
         CardRequestDto cardRequestDto = new CardRequestDto("Visa", BigDecimal.valueOf(1000));
         Client mockClient = new Client();
         mockClient.setId(clientId);
-
         Mockito.when(clientRepository.findById(clientId)).thenReturn(Optional.of(mockClient));
         Mockito.when(paymentSystemRepository.findByNameIgnoreCase("Visa")).thenReturn(Optional.empty());
 
@@ -118,20 +117,19 @@ public class CardServiceImplTest {
     }
 
     @Test
-    void issueCard_ShouldThrowBadCredentialException_WhenProcessingCenterIsUnsupported() {
+    void issueCardBadCredentialException() {
         Long clientId = 1L;
-        CardRequestDto cardRequestDto = new CardRequestDto("UnsupportedSystem", BigDecimal.valueOf(1000));
-        Client mockClient = new Client();
-        mockClient.setId(clientId);
-        PaymentSystem mockPaymentSystem = new PaymentSystem();
-        mockPaymentSystem.setName("UnsupportedSystem");
 
-        Mockito.when(clientRepository.findById(clientId)).thenReturn(Optional.of(mockClient));
+        CardRequestDto cardRequestDto = new CardRequestDto("UnsupportedSystem", BigDecimal.valueOf(1000));
+        Client client = new Client();
+        client.setId(clientId);
+        PaymentSystem paymentSystem = new PaymentSystem();
+        paymentSystem.setName("UnsupportedSystem");
+        Mockito.when(clientRepository.findById(clientId)).thenReturn(Optional.of(client));
         Mockito.when(paymentSystemRepository.findByNameIgnoreCase("UnsupportedSystem"))
-                .thenReturn(Optional.of(mockPaymentSystem));
+                .thenReturn(Optional.of(paymentSystem));
         Mockito.when(processingCenterFactory.getProcessingCenter("UnsupportedSystem"))
                 .thenThrow(new BadCredentialException("Unsupported payment system"));
-
         BadCredentialException exception = Assertions.assertThrows(BadCredentialException.class, () ->
                 cardService.issueCard(clientId, cardRequestDto));
         Assertions.assertEquals("Unsupported payment system", exception.getMessage());
@@ -139,69 +137,67 @@ public class CardServiceImplTest {
 
 
     @Test
-    void replenishment_ShouldReplenishCardBalance_WhenValidInput() {
+    void replenishment() {
         Long cardId = 1L;
         BigDecimal amountToReplenish = BigDecimal.valueOf(500);
 
         // Создаем клиента и карту
-        Client mockClient = new Client();
-        mockClient.setId(1L);  // Инициализируем ID клиента
-        mockClient.setName("John Doe");
+        Client client = new Client();
+        client.setId(1L);
+        client.setName("Abubakir Kubanychbekov");
 
-        Card mockCard = new Card();
-        mockCard.setId(cardId);
-        mockCard.setBalance(BigDecimal.valueOf(1000));  // Начальный баланс карты
-        mockCard.setClient(mockClient);  // Устанавливаем клиента в карту
+        Card card = new Card();
+        card.setId(cardId);
+        card.setBalance(BigDecimal.valueOf(1000));
+        card.setClient(client);
 
-        Mockito.when(cardRepository.findById(cardId)).thenReturn(Optional.of(mockCard));
-
+        Mockito.when(cardRepository.findById(cardId)).thenReturn(Optional.of(card));
         Mockito.when(cardRepository.save(Mockito.any(Card.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         CardResponseDto result = cardService.replenishment(cardId, amountToReplenish);
 
         Assertions.assertNotNull(result);
-        Assertions.assertEquals(BigDecimal.valueOf(1500), result.getBalance()); // Ожидаемый баланс после пополнения
-        Assertions.assertEquals(mockClient.getId(), result.getClientId()); // Проверяем, что clientId в DTO соответствует ID клиента
-        Mockito.verify(cardRepository, Mockito.times(1)).save(Mockito.any(Card.class)); // Проверяем, что метод save был вызван
+        Assertions.assertEquals(BigDecimal.valueOf(1500), result.getBalance());
+        Assertions.assertEquals(client.getId(), result.getClientId());
+        Mockito.verify(cardRepository, Mockito.times(1)).save(Mockito.any(Card.class));
     }
 
 
 
     @Test
-    void withdraw_ShouldWithdrawFromCard_WhenValidInput() {
+    void withdraw() {
         Long cardId = 1L;
         BigDecimal amountToWithdraw = BigDecimal.valueOf(500);
 
         // Создаем клиента и карту
-        Client mockClient = new Client();
-        mockClient.setId(1L);  // Инициализируем ID клиента
-        mockClient.setName("John Doe");
+        Client client = new Client();
+        client.setId(1L);
+        client.setName("Abubakir Kubanychbekov");
 
-        Card mockCard = new Card();
-        mockCard.setId(cardId);
-        mockCard.setBalance(BigDecimal.valueOf(1000));  // Начальный баланс карты
-        mockCard.setClient(mockClient);  // Устанавливаем клиента в карту
+        Card card = new Card();
+        card.setId(cardId);
+        card.setBalance(BigDecimal.valueOf(1000));
+        card.setClient(client);
 
-        Mockito.when(cardRepository.findById(cardId)).thenReturn(Optional.of(mockCard));
-
+        Mockito.when(cardRepository.findById(cardId)).thenReturn(Optional.of(card));
         Mockito.when(cardRepository.save(Mockito.any(Card.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         CardResponseDto result = cardService.withdraw(cardId, amountToWithdraw);
 
         Assertions.assertNotNull(result);
-        Assertions.assertEquals(BigDecimal.valueOf(500), result.getBalance()); // Ожидаемый баланс после снятия
-        Assertions.assertEquals(mockClient.getId(), result.getClientId()); // Проверяем, что clientId в DTO соответствует ID клиента
-        Mockito.verify(cardRepository, Mockito.times(1)).save(Mockito.any(Card.class)); // Проверяем, что метод save был вызван
+        Assertions.assertEquals(BigDecimal.valueOf(500), result.getBalance());
+        Assertions.assertEquals(client.getId(), result.getClientId());
+        Mockito.verify(cardRepository, Mockito.times(1)).save(Mockito.any(Card.class));
     }
 
 
     @Test
-    void withdraw_ShouldThrowException_WhenInsufficientBalance() {
+    void withdrawExceptionInsufficientBalance() {
         Long cardId = 1L;
         BigDecimal amountToWithdraw = BigDecimal.valueOf(1500);
         Card mockCard = new Card();
         mockCard.setId(cardId);
-        mockCard.setBalance(BigDecimal.valueOf(1000));  // Начальный баланс карты
+        mockCard.setBalance(BigDecimal.valueOf(1000));
 
         Mockito.when(cardRepository.findById(cardId)).thenReturn(Optional.of(mockCard));
 

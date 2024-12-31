@@ -31,65 +31,61 @@ public class PaymentSystemServiceImplTest {
     private PaymentSystemServiceImpl paymentSystemService;
 
     @Test
-    void getAllPaymentSystems_ShouldReturnListOfPaymentSystems() {
-        PaymentSystem paymentSystem1 = new PaymentSystem();
-        paymentSystem1.setId(1L);
-        paymentSystem1.setName("System 1");
+    void getAllPaymentSystems() {
+        PaymentSystem visa = new PaymentSystem();
+        visa.setId(1L);
+        visa.setName("Visa");
 
-        PaymentSystem paymentSystem2 = new PaymentSystem();
-        paymentSystem2.setId(2L);
-        paymentSystem2.setName("System 2");
+        PaymentSystem elcart = new PaymentSystem();
+        elcart.setId(2L);
+        elcart.setName("Elcart");
 
-        Mockito.when(paymentSystemRepository.findAll()).thenReturn(List.of(paymentSystem1, paymentSystem2));
+        Mockito.when(paymentSystemRepository.findAll()).thenReturn(List.of(visa, elcart));
 
         List<PaymentSystemResponseDto> result = paymentSystemService.getAllPaymentSystems();
-
         Assertions.assertNotNull(result);
         Assertions.assertEquals(2, result.size());
-        Assertions.assertEquals("System 1", result.get(0).getName());
-        Assertions.assertEquals("System 2", result.get(1).getName());
+        Assertions.assertEquals("Visa", result.get(0).getName());
+        Assertions.assertEquals("Elcart", result.get(1).getName());
     }
 
     @Test
-    void createPaymentSystem_ShouldSavePaymentSystem_WhenValidInput() {
+    void createPaymentSystem() {
         PaymentSystemRequestDto requestDto = new PaymentSystemRequestDto();
         requestDto.setName("New System");
 
         PaymentSystem savedPaymentSystem = new PaymentSystem();
         savedPaymentSystem.setId(1L);
-        savedPaymentSystem.setName("New System");
+        savedPaymentSystem.setName("Visa");
 
-        Mockito.when(paymentSystemRepository.save(Mockito.any(PaymentSystem.class))).thenReturn(savedPaymentSystem);
+        Mockito.when(paymentSystemRepository.save(Mockito.any(PaymentSystem.class)))
+                .thenReturn(savedPaymentSystem);
 
         PaymentSystemResponseDto result = paymentSystemService.createPaymentSystem(requestDto);
-
         Assertions.assertNotNull(result);
         Assertions.assertEquals(1L, result.getId());
-        Assertions.assertEquals("New System", result.getName());
+        Assertions.assertEquals("Visa", result.getName());
     }
 
     @Test
-    void getPaymentSystemById_ShouldReturnPaymentSystem_WhenExists() {
+    void getPaymentSystemById() {
         Long id = 1L;
+
         PaymentSystem paymentSystem = new PaymentSystem();
         paymentSystem.setId(id);
-        paymentSystem.setName("Existing System");
-
+        paymentSystem.setName("Visa");
         Mockito.when(paymentSystemRepository.findById(id)).thenReturn(Optional.of(paymentSystem));
-
         PaymentSystemResponseDto result = paymentSystemService.getPaymentSystemById(id);
-
         Assertions.assertNotNull(result);
         Assertions.assertEquals(id, result.getId());
-        Assertions.assertEquals("Existing System", result.getName());
+        Assertions.assertEquals("Visa", result.getName());
     }
 
     @Test
-    void getPaymentSystemById_ShouldThrowNotFoundException_WhenNotFound() {
+    void getPaymentSystemByIdNotFoundException() {
         Long id = 1L;
 
         Mockito.when(paymentSystemRepository.findById(id)).thenReturn(Optional.empty());
-
         NotFoundException exception = Assertions.assertThrows(NotFoundException.class, () -> {
             paymentSystemService.getPaymentSystemById(id);
         });
@@ -98,47 +94,45 @@ public class PaymentSystemServiceImplTest {
 
 
     @Test
-    void updatePaymentSystem_ShouldUpdatePaymentSystem_WhenExists() {
+    void updatePaymentSystem() {
         Long id = 1L;
         PaymentSystemRequestDto requestDto = new PaymentSystemRequestDto();
         requestDto.setName("Updated System");
 
         PaymentSystem existingPaymentSystem = new PaymentSystem();
         existingPaymentSystem.setId(id);
-        existingPaymentSystem.setName("Old System");
+        existingPaymentSystem.setName("Visa");
 
         PaymentSystem updatedPaymentSystem = new PaymentSystem();
         updatedPaymentSystem.setId(id);
-        updatedPaymentSystem.setName("Updated System");
+        updatedPaymentSystem.setName("Elcart");
 
-        Mockito.when(paymentSystemRepository.findById(id)).thenReturn(Optional.of(existingPaymentSystem));
-        Mockito.when(paymentSystemRepository.save(Mockito.any(PaymentSystem.class))).thenReturn(updatedPaymentSystem);
+        Mockito.when(paymentSystemRepository.findById(id))
+                .thenReturn(Optional.of(existingPaymentSystem));
+        Mockito.when(paymentSystemRepository.save(Mockito.any(PaymentSystem.class)))
+                .thenReturn(updatedPaymentSystem);
 
         PaymentSystemResponseDto result = paymentSystemService.updatePaymentSystem(id, requestDto);
-
         Assertions.assertNotNull(result);
-        Assertions.assertEquals("Updated System", result.getName());
+        Assertions.assertEquals("Elcart", result.getName());
     }
 
     @Test
-    void deletePaymentSystem_ShouldDeletePaymentSystem_WhenExists() {
+    void deletePaymentSystem() {
         Long id = 1L;
 
         Mockito.when(paymentSystemRepository.existsById(id)).thenReturn(true);
-
         SimpleResponse result = paymentSystemService.deletePaymentSystem(id);
-
         Assertions.assertNotNull(result);
         Assertions.assertEquals(HttpStatus.OK, result.getHttpStatus());
         Assertions.assertTrue(result.getMessage().contains("success deleted"));
     }
 
     @Test
-    void deletePaymentSystem_ShouldThrowNotFoundException_WhenNotFound() {
+    void deletePaymentSystemNotFoundException() {
         Long id = 1L;
 
         Mockito.when(paymentSystemRepository.existsById(id)).thenReturn(false);
-
         NotFoundException exception = Assertions.assertThrows(NotFoundException.class, () -> {
             paymentSystemService.deletePaymentSystem(id);
         });

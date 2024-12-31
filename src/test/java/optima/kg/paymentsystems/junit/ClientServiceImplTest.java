@@ -34,14 +34,14 @@ public class ClientServiceImplTest {
     private ClientServiceImpl clientService;
 
     @Test
-    void getAllClients_ShouldReturnListOfClients() {
+    void getAllClients() {
         Client client1 = new Client();
         client1.setId(1L);
-        client1.setName("Client 1");
+        client1.setName("Abubakir");
 
         Client client2 = new Client();
         client2.setId(2L);
-        client2.setName("Client 2");
+        client2.setName("Kubanychbek");
 
         List<Client> clients = Arrays.asList(client1, client2);
 
@@ -56,11 +56,12 @@ public class ClientServiceImplTest {
     }
 
     @Test
-    void getClientById_ShouldReturnClient_WhenClientExists() {
+    void getClientById() {
         Long clientId = 1L;
+
         Client client = new Client();
         client.setId(clientId);
-        client.setName("Client 1");
+        client.setName("Abubakir Kubanychbekov");
 
         Mockito.when(clientRepository.findById(clientId)).thenReturn(Optional.of(client));
 
@@ -72,13 +73,13 @@ public class ClientServiceImplTest {
     }
 
     @Test
-    void saveClient_ShouldSaveClient_WhenValidInput() {
+    void saveClient() {
         ClientRequestDto clientRequestDto = new ClientRequestDto();
         clientRequestDto.setName("Client 1");
 
         Client client = new Client();
         client.setId(1L);
-        client.setName("Client 1");
+        client.setName("Abubakir Kubanychbekov");
 
         Mockito.when(clientRepository.save(Mockito.any(Client.class))).thenReturn(client);
 
@@ -90,7 +91,7 @@ public class ClientServiceImplTest {
 
 
     @Test
-    void getClientById_ShouldThrowNotFoundException_WhenClientDoesNotExist() {
+    void getClientByIdNotFoundException() {
         Long clientId = 1L;
 
         Mockito.when(clientRepository.findById(clientId)).thenReturn(Optional.empty());
@@ -104,48 +105,46 @@ public class ClientServiceImplTest {
 
 
     @Test
-    void updateClient_ShouldUpdateClient_WhenClientExists() {
+    void updateClient() {
         Long clientId = 1L;
         ClientRequestDto clientRequestDto = new ClientRequestDto();
         clientRequestDto.setName("Updated Client");
 
-        Client existingClient = new Client();
-        existingClient.setId(clientId);
-        existingClient.setName("Old Client");
+        Client client = new Client();
+        client.setId(clientId);
+        client.setName("Abubakir");
 
         Client updatedClient = new Client();
         updatedClient.setId(clientId);
-        updatedClient.setName("Updated Client");
+        updatedClient.setName("Kubanychbek");
 
-        Mockito.when(clientRepository.findById(clientId)).thenReturn(Optional.of(existingClient));
+        Mockito.when(clientRepository.findById(clientId)).thenReturn(Optional.of(client));
         Mockito.when(clientRepository.save(Mockito.any(Client.class))).thenReturn(updatedClient);
 
         ClientResponseDto result = clientService.updateClient(clientId, clientRequestDto);
 
         Assertions.assertNotNull(result);
-        Assertions.assertEquals("Updated Client", result.getName());
+        Assertions.assertEquals("Kubanychbek", result.getName());
     }
 
 
     @Test
-    void deleteClient_ShouldDeleteClient_WhenClientExists() {
+    void deleteClient() {
         Long clientId = 1L;
 
         Mockito.when(clientRepository.existsById(clientId)).thenReturn(true);
 
         SimpleResponse result = clientService.deleteClient(clientId);
-
         Assertions.assertNotNull(result);
         Assertions.assertEquals(HttpStatus.OK, result.getHttpStatus());
         Assertions.assertTrue(result.getMessage().contains("success deleted"));
     }
 
     @Test
-    void deleteClient_ShouldThrowAlreadyExistException_WhenClientDoesNotExist() {
+    void deleteClientAlreadyExistException() {
         Long clientId = 1L;
 
         Mockito.when(clientRepository.existsById(clientId)).thenReturn(false);
-
         AlreadyExistException exception = Assertions.assertThrows(AlreadyExistException.class, () -> {
             clientService.deleteClient(clientId);
         });

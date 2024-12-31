@@ -28,25 +28,25 @@ public class ProcessingCenterFactoryTest {
     private ProcessingCenterFactory processingCenterFactory;
 
     @Test
-    void getProcessingCenter_ShouldReturnVisaProcessingCenter_WhenVisaIsProvided() {
-        ProcessingCenter processingCenter = processingCenterFactory.getProcessingCenter("visa");
+    void getProcessingCenterVisa() {
+        ProcessingCenter processingCenter = processingCenterFactory.getProcessingCenter("Visa");
         Assertions.assertEquals(visaProcessingCenter, processingCenter);
     }
 
     @Test
-    void getProcessingCenter_ShouldReturnMasterCardProcessingCenter_WhenMasterCardIsProvided() {
-        ProcessingCenter processingCenter = processingCenterFactory.getProcessingCenter("mastercard");
+    void getProcessingCenterMasterCard() {
+        ProcessingCenter processingCenter = processingCenterFactory.getProcessingCenter("MasterCard");
         Assertions.assertEquals(masterCardProcessingCenter, processingCenter);
     }
 
     @Test
-    void getProcessingCenter_ShouldReturnElcartProcessingCenter_WhenElcartIsProvided() {
-        ProcessingCenter processingCenter = processingCenterFactory.getProcessingCenter("elcart");
+    void getProcessingCenterEclart() {
+        ProcessingCenter processingCenter = processingCenterFactory.getProcessingCenter("Elcart");
         Assertions.assertEquals(elcartProcessingCenter, processingCenter);
     }
 
     @Test
-    void getProcessingCenter_ShouldThrowBadCredentialException_WhenUnsupportedSystemIsProvided() {
+    void getProcessingCenterBadCredentialException() {
         BadCredentialException exception = Assertions.assertThrows(
                 BadCredentialException.class,
                 () -> processingCenterFactory.getProcessingCenter("unsupported")
