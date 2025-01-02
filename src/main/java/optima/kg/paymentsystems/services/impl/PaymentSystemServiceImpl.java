@@ -1,5 +1,6 @@
 package optima.kg.paymentsystems.services.impl;
 
+import lombok.RequiredArgsConstructor;
 import optima.kg.paymentsystems.dal.entity.Card;
 import optima.kg.paymentsystems.dal.entity.PaymentSystem;
 import optima.kg.paymentsystems.dal.repository.PaymentSystemRepository;
@@ -20,13 +21,11 @@ import java.util.stream.Collectors;
  * @author Abubakir Dev
  */
 @Service
+@RequiredArgsConstructor
 public class PaymentSystemServiceImpl implements PaymentSystemService {
     private final PaymentSystemRepository paymentSystemRepository;
     private final Logger log = LoggerFactory.getLogger(PaymentSystemServiceImpl.class);
 
-    public PaymentSystemServiceImpl(PaymentSystemRepository paymentSystemRepository) {
-        this.paymentSystemRepository = paymentSystemRepository;
-    }
 
     /**
      * Retrieves all payment systems from the database.

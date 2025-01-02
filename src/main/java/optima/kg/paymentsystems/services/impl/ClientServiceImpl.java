@@ -1,5 +1,7 @@
 package optima.kg.paymentsystems.services.impl;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import optima.kg.paymentsystems.dal.entity.Client;
 import optima.kg.paymentsystems.dal.repository.ClientRepository;
 import optima.kg.paymentsystems.dto.SimpleResponse;
@@ -8,8 +10,6 @@ import optima.kg.paymentsystems.dto.client.ClientResponseDto;
 import optima.kg.paymentsystems.exceptions.AlreadyExistException;
 import optima.kg.paymentsystems.exceptions.NotFoundException;
 import optima.kg.paymentsystems.services.ClientService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -21,14 +21,11 @@ import java.util.stream.Collectors;
  * @author Abubakir Dev
  */
 @Service
+@Slf4j
+@RequiredArgsConstructor
 public class ClientServiceImpl implements ClientService {
 
     private final ClientRepository clientRepository;
-    private final Logger log = LoggerFactory.getLogger(ClientServiceImpl.class);
-
-    public ClientServiceImpl(ClientRepository clientRepository) {
-        this.clientRepository = clientRepository;
-    }
 
     /**
      * Retrieves all clients from the database.
@@ -116,14 +113,13 @@ public class ClientServiceImpl implements ClientService {
      * @return A ClientResponseDto containing the client's details.
      */
     private ClientResponseDto mapToResponseDTO(Client client) {
-        ClientResponseDto dto = new ClientResponseDto();
-        dto.setId(client.getId());
-        dto.setName(client.getName());
-        dto.setCardIds(client.getCards() != null
-                ? client.getCards().stream()
-                .map(card -> card.getId())
-                .collect(Collectors.toList())
-                : new ArrayList<>());
-        return dto;
+        return ClientResponseDto.builder()
+                .id(client.getId())
+                .name(client.getName())
+                .cardIds(client.getCards() != null ? client.getCards().stream()
+                        .map(card -> card.getId())
+                        .collect(Collectors.toList())
+                        : new ArrayList<>())
+                .build();
     }
 }

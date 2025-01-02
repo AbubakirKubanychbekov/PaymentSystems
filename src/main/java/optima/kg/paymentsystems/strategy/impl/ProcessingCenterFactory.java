@@ -1,5 +1,6 @@
 package optima.kg.paymentsystems.strategy.impl;
 
+import lombok.RequiredArgsConstructor;
 import optima.kg.paymentsystems.exceptions.BadCredentialException;
 import optima.kg.paymentsystems.strategy.ProcessingCenter;
 import org.springframework.stereotype.Service;
@@ -8,19 +9,12 @@ import org.springframework.stereotype.Service;
  * @author Abubakir Dev
  */
 @Service
+@RequiredArgsConstructor
 public class ProcessingCenterFactory {
     private final VisaProcessingCenter visaProcessingCenter;
     private final MasterCardProcessingCenter masterCardProcessingCenter;
     private final ElcartProcessingCenter elcartProcessingCenter;
 
-    public ProcessingCenterFactory(
-            VisaProcessingCenter visaProcessingCenter,
-            MasterCardProcessingCenter masterCardProcessingCenter,
-            ElcartProcessingCenter elcartProcessingCenter) {
-        this.visaProcessingCenter = visaProcessingCenter;
-        this.masterCardProcessingCenter = masterCardProcessingCenter;
-        this.elcartProcessingCenter = elcartProcessingCenter;
-    }
 
     /**
      * Returns the appropriate {@link ProcessingCenter} based on the payment system name.

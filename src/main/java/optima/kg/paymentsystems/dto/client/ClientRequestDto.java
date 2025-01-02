@@ -1,19 +1,14 @@
 package optima.kg.paymentsystems.dto.client;
 
-import lombok.Data;
+import lombok.*;
 
 /**
  * @author Abubakir Dev
  */
 
+@Getter @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class ClientRequestDto {
     private String name;
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 }

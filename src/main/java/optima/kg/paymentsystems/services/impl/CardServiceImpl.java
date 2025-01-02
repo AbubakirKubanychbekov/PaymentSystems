@@ -1,5 +1,6 @@
 package optima.kg.paymentsystems.services.impl;
 
+import lombok.RequiredArgsConstructor;
 import optima.kg.paymentsystems.dal.entity.Card;
 import optima.kg.paymentsystems.dal.entity.Client;
 import optima.kg.paymentsystems.dal.entity.PaymentSystem;
@@ -17,6 +18,7 @@ import optima.kg.paymentsystems.strategy.impl.ProcessingCenterFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
@@ -24,6 +26,7 @@ import java.math.BigDecimal;
  * @author Abubakir Dev
  */
 @Service
+@RequiredArgsConstructor
 public class CardServiceImpl implements CardService {
     private final ClientRepository clientRepository;
     private final CardRepository cardRepository;
@@ -32,14 +35,6 @@ public class CardServiceImpl implements CardService {
     private final CardEventProducer cardEventProducer;
     private final Logger log = LoggerFactory.getLogger(CardServiceImpl.class);
 
-    public CardServiceImpl(ClientRepository clientRepository, CardRepository cardRepository,
-                           ProcessingCenterFactory processingCenterFactory, PaymentSystemRepository paymentSystemRepository, CardEventProducer cardEventProducer) {
-        this.clientRepository = clientRepository;
-        this.cardRepository = cardRepository;
-        this.processingCenterFactory = processingCenterFactory;
-        this.paymentSystemRepository = paymentSystemRepository;
-        this.cardEventProducer = cardEventProducer;
-    }
 
     /**
      * Issues a new card for the specified client with the provided payment system and amount and publishes an event to RabbitMQ.
@@ -50,6 +45,7 @@ public class CardServiceImpl implements CardService {
      * @throws NotFoundException      if the client or payment system is not found.
      * @throws BadCredentialException if the payment system is unsupported.
      */
+    @Transactional
     @Override
     public CardResponseDto issueCard(Long clientId, CardRequestDto card) {
         Client client = clientRepository.findById(clientId)
@@ -126,12 +122,12 @@ public class CardServiceImpl implements CardService {
      * @return The mapped CardResponseDto.
      */
     private CardResponseDto mapToResponseDto(Card card) {
-        return new CardResponseDto(
-                card.getId(),
-                card.getCardNumber(),
-                card.getBalance(),
-                card.getClient().getId(),
-                card.getPaymentSystem() != null ? card.getPaymentSystem().getName() : null
-        );
+        return CardResponseDto.builder()
+                .id(card.getId())
+                .cardNumber(String.valueOf(card.getCardNumber()))
+                .balance(card.getBalance())
+                .clientId(card.getClient().getId())
+                .paymentSystem(card.getPaymentSystem() != null ? card.getPaymentSystem().getName() : null)
+                .build();
     }
 }

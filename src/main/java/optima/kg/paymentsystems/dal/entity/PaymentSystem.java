@@ -14,6 +14,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Getter @Setter
+@ToString
 public class PaymentSystem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,36 +25,4 @@ public class PaymentSystem {
 
     @OneToMany(mappedBy = "paymentSystem", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Card> cards = new ArrayList<>();
-
-    public List<Card> getCards() {
-        return cards;
-    }
-
-    public void setCards(List<Card> cards) {
-        this.cards = cards;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String toString() {
-        return "PaymentSystem{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                '}';
-    }
 }
